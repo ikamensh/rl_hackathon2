@@ -1,5 +1,5 @@
 from math import inf as infinity
-from random_ai import RandomAI
+from ai.random_ai import RandomAI
 
 class MinimaxAI:
 

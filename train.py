@@ -20,12 +20,12 @@ parser.add_argument('--env-name', type=str, default='TicTacToe')
 parser.add_argument('--weights', type=str, default=None)
 args = parser.parse_args()
 
-
+# Get the environment and extract the number of actions.
 from gym.wrappers import TimeLimit
 env = TimeLimit(TicTacToe(), max_episode_steps=10)
 nb_actions = env.action_space.n
 
-
+# Next, we build our model. We use the same model that was described by Mnih et al. (2015).
 WINDOW_LENGTH = 4
 input_shape = (3,3)
 input_shape = (WINDOW_LENGTH,) + input_shape
@@ -41,12 +41,23 @@ def build_model():
 
 model = build_model()
 
-
+# Finally, we configure and compile our agent. You can use every built-in Keras optimizer and
+# even the metrics!
 memory = SequentialMemory(limit=1000000, window_length=WINDOW_LENGTH)
+
+# Select a policy. We use eps-greedy action selection, which means that a random action is selected
+# with probability eps. We anneal eps from 1.0 to 0.1 over the course of 1M steps. This is done so that
+# the agent initially explores the environment (high eps) and then gradually sticks to what it knows
+# (low eps). We also set a dedicated eps value that is used during testing. Note that we set it to 0.05
+# so that the agent still performs some random actions. This ensures that the agent cannot get stuck.
 policy = LinearAnnealedPolicy(EpsGreedyQPolicy(), attr='eps', value_max=1., value_min=.1, value_test=.05,
                               nb_steps=1000000)
 
-
+# The trade-off between exploration and exploitation is difficult and an on-going research topic.
+# If you want, you can experiment with the parameters or use a different policy. Another popular one
+# is Boltzmann-style exploration:
+# policy = BoltzmannQPolicy(tau=1.)
+# Feel free to give it a try!
 dqn = DQNAgent(model=model, nb_actions=nb_actions, policy=policy, memory=memory, nb_steps_warmup=50000, gamma=.99,
                target_model_update=10000,
                train_interval=4, delta_clip=1.)

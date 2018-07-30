@@ -5,8 +5,6 @@ from gym.core import Env
 from ai.minimax_ai import MinimaxAI
 from gym import spaces
 
-
-
 class TicTacToe(Env):
 
     def __init__(self):
@@ -104,7 +102,7 @@ class TicTacToe(Env):
         board_as_tuple = tuple(tuple(board[row]) for row in range(3))
         return TicTacToe._evaluate(board_as_tuple)
 
-    def play_a_game(self):
+    def play_ai_game(self):
         while self.evaluate(self.board) is None:
             ai = self.x_ai if self.x_next else self.o_ai
             row, column = ai.decide_turn()
@@ -146,13 +144,67 @@ class TicTacToe(Env):
                 return None
 
 
+    def play_vs_human(self):
+        print("Welcome to Tic-Tac-Toe. Your opponent is a minimax AI, who makes first turn randomly. \n"
+              "Use numbers from 0 to 8 to make turns. Below is the map of numbers to cells.")
+        print("""
+         0 | 1 | 2
+        -  + - + -
+         3 | 4 | 5
+        -  + - + -
+         6 | 7 | 8""")
+        "You play for x, your opponent plays for o"
+        self.reset()
+        done = False
+        while not done:
+            try:
+                self.render()
+                action = int(input(">>> "))
+            except:
+                print("could not parse your input. Please try again. Use numbers from 0 to 8 to make turns.")
+            else:
+                row = action // 3
+                column = action % 3
+
+                valid_turn = self.try_make_turn(row, column)
+                if not valid_turn:
+                    print("Unfortunately you can't overwrite existing shapes. \n"
+                          "You have made an invalid turn and therefore lost the game.")
+                    break
+
+                result = self.evaluate(self.board)
+
+                if result:
+                    self.render()
+                    if result == 1:
+                        print("Congratulations! you have won the game!")
+                    elif result == 0:
+                        print("The game has ended in a draw.")
+                    break
+
+                row, column = self.o_ai.decide_turn()
+                assert self.try_make_turn(row, column)
+                result = self.evaluate(self.board)
+
+                if result:
+                    self.render()
+                    if result == -1:
+                        print("Minimax AI has won the game.")
+                    elif result == 0:
+                        print("The game has ended in a draw.")
+                    break
+
+
+        print("Thanks for playing Tic-Tac-Toe. Have a nice day and come back any time!")
+
+
     def render(self, mode="Human"):
         shapes = {-1: 'o', 0: ' ', 1: 'x'}
-        print(f"{shapes[self.board[0,0]]}|{shapes[self.board[0,1]]}|{shapes[self.board[0,2]]}")
-        print('-+-+-')
-        print(f"{shapes[self.board[1,0]]}|{shapes[self.board[1,1]]}|{shapes[self.board[1,2]]}")
-        print('-+-+-')
-        print(f"{shapes[self.board[2,0]]}|{shapes[self.board[2,1]]}|{shapes[self.board[2,2]]}")
+        print(f"{shapes[self.board[0,0]]} | {shapes[self.board[0,1]]} | {shapes[self.board[0,2]]}")
+        print('- + - + -')
+        print(f"{shapes[self.board[1,0]]} | {shapes[self.board[1,1]]} | {shapes[self.board[1,2]]}")
+        print('- + - + -')
+        print(f"{shapes[self.board[2,0]]} | {shapes[self.board[2,1]]} | {shapes[self.board[2,2]]}")
 
 
 
