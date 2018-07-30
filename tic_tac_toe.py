@@ -174,7 +174,7 @@ class TicTacToe(Env):
 
                 result = self.evaluate(self.board)
 
-                if result:
+                if result is not None:
                     self.render()
                     if result == 1:
                         print("Congratulations! you have won the game!")
@@ -186,7 +186,7 @@ class TicTacToe(Env):
                 assert self.try_make_turn(row, column)
                 result = self.evaluate(self.board)
 
-                if result:
+                if result is not None:
                     self.render()
                     if result == -1:
                         print("Minimax AI has won the game.")
