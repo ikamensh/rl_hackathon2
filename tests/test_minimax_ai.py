@@ -1,5 +1,5 @@
 from tic_tac_toe import TicTacToe
-from minimax_ai import MinimaxAI
+from ai.minimax_ai import MinimaxAI
 import numpy as np
 
 def test_makes_valid_turns():

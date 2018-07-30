@@ -1,5 +1,5 @@
 from tic_tac_toe import TicTacToe
-from random_ai import RandomAI
+from ai.random_ai import RandomAI
 
 
 def test_makes_valid_turns():
