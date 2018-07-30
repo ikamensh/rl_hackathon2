@@ -20,7 +20,7 @@ class NeuralAI:
                        memory=SequentialMemory(limit=10, window_length=WINDOW_LENGTH))
 
         dqn.compile(Adam(lr=1e-3), metrics=['mae'])
-        weights_filename = weights_path or 'dqn_TicTacToe_weights.h5f'
+        weights_filename = weights_path or 'saved_dqn_TicTacToe_weights.h5f'
         dqn.load_weights(weights_filename)
         self.dqn = dqn
 
