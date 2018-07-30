@@ -13,13 +13,23 @@ class TicTacToe(Env):
         self.board = np.zeros([3,3], dtype=np.int8)
         self.x_next = True if random.random() > 0.5 else False
 
+        # by design, our AI plays x and the hard-coded AI plays for o
         self.x_ai = None
         self.o_ai = MinimaxAI(self)
+
+        # action space consists of 9 distinct actions - trying to place your shape to each of 9 cells.
         self.action_space = spaces.Discrete(9)
+        # observation space is the state of the board, as numpy array with possible values of
+        # -1 - cell with 'o',
+        # 0  - empty cell,
+        # 1  - cell with 'x'
         self.observation_space = spaces.Box(low=-1, high=1, dtype=np.int8, shape=(3,3))
 
 
     def reset(self):
+        """
+        Resets the board for the next game. Starting player is random.
+        """
         self.board = np.zeros([3, 3])
         self.x_next = True if random.random() > 0.5 else False
         if not self.x_next:
@@ -43,33 +53,34 @@ class TicTacToe(Env):
         if invalid action is used, board does not change, but negative reward is returned.
         :return: observation, reward, done?, info (empty)
         """
-        assert self.x_next # verify it is your turn
-
-        # extract row and column from your actions
-
+        assert self.x_next
         row = action // 3
         column = action % 3
-
-        # Info is an empty dictionary. a dictionary is required by the keras-rl specs.
         info = {}
 
-        # use the row and column to try to make a step
+        valid_turn = self.try_make_turn(row,column)
+        if valid_turn:
+            result = self.evaluate(self.board)
+            if result is None:
+                row, column = self.o_ai.decide_turn()
+                assert self.try_make_turn(row, column)
+                result = self.evaluate(self.board)
 
-        # if the turn is not a valid one, the game ends and we lose it.
-        # The reward should be negative and greater than a game lost normally.
+            if result is None:
+                return self.board, 0, False, info
+            else:
+                return self.board, result, True, info
 
-        # check it your turn has ended the game.
-        # if not, opponent should make his turn, and we check again if the game is over.
-
-        #if the game is over, we return the observation, reward = self.evaluate(self.board), done = True and the info.
-
-        # if the game is not over, we return the observation, reward = 0, done = False and the info.
-
-        # TODO default return - remove it when you implement a real one.
-        return np.zeros([3,3]), 0, False, info
+        else:
+            return self.board, -1.5, False, info
 
 
     def try_make_turn(self, row, column):
+        """
+        The current player according to the boolean self.x_next tries to make a turn
+        by placing their shape on the crossection of the crossection of :param row and :param column
+        :return: True if it was a valid turn, False if such turn is not allowed (the cell is not empty).
+        """
 
         if self.board[row,column] == 0:
 
@@ -82,6 +93,14 @@ class TicTacToe(Env):
 
     @staticmethod
     def evaluate(board):
+        """
+        takes a :param board as the input ([3,3] numpy array),
+        :return:
+            None if the game is not over,
+            1 if x won,
+            -1 if o won,
+            0 if its a draw
+        """
         board_as_tuple = tuple(tuple(board[row]) for row in range(3))
         return TicTacToe._evaluate(board_as_tuple)
 
