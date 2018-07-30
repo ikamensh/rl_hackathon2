@@ -51,26 +51,30 @@ class TicTacToe(Env):
         if invalid action is used, board does not change, but negative reward is returned.
         :return: observation, reward, done?, info (empty)
         """
-        assert self.x_next
+        assert self.x_next # verify it is your turn
+
+        # extract row and column from your actions
+
         row = action // 3
         column = action % 3
+
+        # Info is an empty dictionary. a dictionary is required by the keras-rl specs.
         info = {}
 
-        valid_turn = self.try_make_turn(row,column)
-        if valid_turn:
-            result = self.evaluate(self.board)
-            if result is None:
-                row, column = self.o_ai.decide_turn()
-                assert self.try_make_turn(row, column)
-                result = self.evaluate(self.board)
+        # use the row and column to try to make a step
 
-            if result is None:
-                return self.board, 0, False, info
-            else:
-                return self.board, result, True, info
+        # if the turn is not a valid one, the game ends and we lose it.
+        # The reward should be negative and greater than a game lost normally.
 
-        else:
-            return self.board, -1.5, False, info
+        # check it your turn has ended the game.
+        # if not, opponent should make his turn, and we check again if the game is over.
+
+        #if the game is over, we return the observation, reward = self.evaluate(self.board), done = True and the info.
+
+        # if the game is not over, we return the observation, reward = 0, done = False and the info.
+
+        # TODO default return - remove it when you implement a real one.
+        return np.zeros([3,3]), 0, False, info
 
 
     def try_make_turn(self, row, column):
