@@ -74,7 +74,7 @@ if args.mode == 'train':
     callbacks = [ModelIntervalCheckpoint(checkpoint_weights_filename, interval=250000)]
     callbacks += [FileLogger(log_filename, interval=100)]
     print("about to fit the dqn!")
-    dqn.fit(env, callbacks=callbacks, nb_steps=int(1e7), log_interval=10000, verbose=1)
+    dqn.fit(env, callbacks=callbacks, nb_steps=int(1e6), log_interval=10000, verbose=1)
 
     # After training is done, we save the final weights one more time.
     dqn.save_weights(weights_filename, overwrite=True)
