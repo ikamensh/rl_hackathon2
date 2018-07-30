@@ -15,7 +15,7 @@ ttt.o_ai = o_ai
 
 
 counters = {-1:0, 0:0, 1:0}
-n_games = int(1e5)
+n_games = int(1e4)
 
 def run_trials():
     for i in range(n_games):
